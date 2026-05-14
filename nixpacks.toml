@@ -1,0 +1,15 @@
+[phases.setup]
+nixPkgs = ["nodejs_20"]
+
+[phases.install]
+cmds = ["echo 'Skipping root npm ci'"]
+
+[phases.build]
+cmds = [
+  "cd SGE/backend && npm install",
+  "cd ../../SGE/frontend && npm install",
+  "cd ../../SGE/frontend && npm run build"
+]
+
+[start]
+cmd = "cd SGE/backend && npm start"
