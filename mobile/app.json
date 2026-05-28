@@ -1,0 +1,39 @@
+{
+  "expo": {
+    "name": "SGE CECyT 9",
+    "slug": "sge-cecyt9-mobile",
+    "version": "0.5.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0f172a"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "mx.novatec.sgececyt9",
+      "infoPlist": {
+        "NSCameraUsageDescription": "La app usa la cámara para escanear códigos QR de acceso al estacionamiento."
+      }
+    },
+    "android": {
+      "package": "mx.novatec.sgececyt9",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0f172a"
+      },
+      "permissions": [
+        "CAMERA"
+      ]
+    },
+    "extra": {
+      "apiUrl": "http://10.0.2.2:3000/api/v1",
+      "socketUrl": "http://10.0.2.2:3000",
+      "eas": {
+        "projectId": "REEMPLAZAR_EN_EAS"
+      }
+    }
+  }
+}
