@@ -16,3 +16,6 @@ coverage/
 backend/.env
 frontend/.env
 **/.env
+.env.test
+backend\test
+test/
