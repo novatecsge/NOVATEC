@@ -13,3 +13,6 @@ build/
 coverage/
 .vscode/
 .idea/
+backend/.env
+frontend/.env
+**/.env

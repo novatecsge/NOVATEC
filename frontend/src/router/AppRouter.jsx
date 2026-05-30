@@ -32,8 +32,8 @@ export default function AppRouter() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
 
-        <Route element={<ProtectedRoute />}>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/" element={<Navigate to="/register" replace />} />
+          <Route element={<ProtectedRoute />}>
 
           <Route element={<RoleRoute allowedRoles={['USER']} />}>
             <Route path="/dashboard" element={<UserDashboardPage />} />
