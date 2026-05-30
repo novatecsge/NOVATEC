@@ -1,7 +1,6 @@
-import React from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { authService } from '../../services/auth.service';
-import { useNavigate } from 'react-router-dom';
 
 export default function RegisterForm() {
   const navigate = useNavigate();
@@ -10,14 +9,17 @@ export default function RegisterForm() {
     fullName: '',
     email: '',
     password: '',
-    consentAccepted: true
+    consentAccepted: false
   });
+
+  const [showTerms, setShowTerms] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
 
   const onChange = (event) => {
     const { name, value, type, checked } = event.target;
+
     setForm((prev) => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
@@ -26,84 +28,135 @@ export default function RegisterForm() {
 
   const onSubmit = async (event) => {
     event.preventDefault();
-    setLoading(true);
     setError('');
     setSuccess('');
+
+    if (!form.consentAccepted) {
+      setError('Debes aceptar los términos y condiciones para crear tu cuenta.');
+      return;
+    }
+
+    setLoading(true);
 
     try {
       await authService.register(form);
       setSuccess('Cuenta creada correctamente. Ahora puedes iniciar sesión.');
       setTimeout(() => navigate('/login'), 1000);
     } catch (err) {
-      setError(err?.response?.data?.message || 'No se pudo registrar la cuenta');
+      setError(err?.response?.data?.message || 'No se pudo registrar la cuenta.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={onSubmit} style={styles.form}>
-      <h2>Registro</h2>
+    <main className="auth-shell">
+      <section className="auth-hero">
+        <div>
+          <h1>NOVATEC SGE</h1>
+          <p>Sistema de Gestión de Estacionamiento del CECyT 9</p>
+        </div>
+      </section>
 
-      <input
-        name="fullName"
-        placeholder="Nombre completo"
-        value={form.fullName}
-        onChange={onChange}
-      />
+      <form onSubmit={onSubmit} className="auth-card auth-form">
+        <h2>Registro</h2>
 
-      <input
-        name="email"
-        placeholder="Correo institucional"
-        value={form.email}
-        onChange={onChange}
-      />
-
-      <input
-        name="password"
-        type="password"
-        placeholder="Contraseña"
-        value={form.password}
-        onChange={onChange}
-      />
-
-      <label>
         <input
-          type="checkbox"
-          name="consentAccepted"
-          checked={form.consentAccepted}
+          name="fullName"
+          placeholder="Nombre completo"
+          value={form.fullName}
           onChange={onChange}
+          required
         />
-        Acepto el tratamiento de datos
-      </label>
 
-      {error ? <p style={styles.error}>{error}</p> : null}
-      {success ? <p style={styles.success}>{success}</p> : null}
+        <input
+          name="email"
+          type="email"
+          placeholder="Correo institucional"
+          value={form.email}
+          onChange={onChange}
+          required
+        />
 
-      <button type="submit" disabled={loading}>
-        {loading ? 'Registrando...' : 'Crear cuenta'}
-      </button>
-    </form>
+        <input
+          name="password"
+          type="password"
+          placeholder="Contraseña"
+          value={form.password}
+          onChange={onChange}
+          required
+        />
+
+        <label className="auth-consent">
+          <input
+            type="checkbox"
+            name="consentAccepted"
+            checked={form.consentAccepted}
+            onChange={onChange}
+          />
+
+          <span>
+            Acepto{' '}
+            <button
+              type="button"
+              className="auth-link-button"
+              onClick={() => setShowTerms(true)}
+            >
+              términos y condiciones
+            </button>
+          </span>
+        </label>
+
+        <p className="auth-login-text">
+          ¿Ya tienes cuenta?{' '}
+          <Link to="/login">
+            Iniciar sesión
+          </Link>
+        </p>
+
+        {error ? <p className="auth-error">{error}</p> : null}
+        {success ? <p className="auth-success">{success}</p> : null}
+
+        <button type="submit" disabled={loading}>
+          {loading ? 'Registrando...' : 'Crear cuenta'}
+        </button>
+      </form>
+
+      {showTerms && (
+        <div className="terms-modal-overlay" onClick={() => setShowTerms(false)}>
+          <section
+            className="terms-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="terms-title"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="terms-modal-header">
+              <h3 id="terms-title">Términos y condiciones</h3>
+
+              <button
+                type="button"
+                className="terms-modal-close"
+                onClick={() => setShowTerms(false)}
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="terms-modal-content">
+              <p>
+                AQUÍ COLOCA TUS TÉRMINOS Y CONDICIONES DEL PROYECTO.
+              </p>
+            </div>
+
+            <div className="terms-modal-actions">
+              <button type="button" onClick={() => setShowTerms(false)}>
+                Cerrar
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
+    </main>
   );
 }
-
-const styles = {
-  form: {
-    width: 420,
-    margin: '80px auto',
-    display: 'grid',
-    gap: 12,
-    padding: 24,
-    border: '1px solid #ddd',
-    borderRadius: 12,
-    background: '#fff'
-  },
-  error: {
-    color: 'crimson',
-    margin: 0
-  },
-  success: {
-    color: 'green',
-    margin: 0
-  }
-};
