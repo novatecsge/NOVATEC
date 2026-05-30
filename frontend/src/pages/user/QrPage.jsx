@@ -138,7 +138,6 @@ export default function QrPage() {
                   style={{
                     whiteSpace: 'pre-wrap',
                     wordBreak: 'break-all',
-                    background: '#f6f6f6',
                     padding: 12,
                     borderRadius: 8
                   }}
