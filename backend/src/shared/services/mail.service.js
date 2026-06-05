@@ -8,10 +8,13 @@ const createTransporter = () => {
     port: Number(process.env.SMTP_PORT || 587),
     secure: Number(process.env.SMTP_PORT) === 465,
     auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS
-    }
-  });
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS
+  },
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 10000
+    });
 };
 
 const sendPasswordResetEmail = async ({ to, fullName, resetUrl }) => {
@@ -22,6 +25,7 @@ const sendPasswordResetEmail = async ({ to, fullName, resetUrl }) => {
     return;
   }
 
+  try {
   await transporter.sendMail({
     from: process.env.SMTP_FROM || process.env.SMTP_USER,
     to,
@@ -35,6 +39,9 @@ const sendPasswordResetEmail = async ({ to, fullName, resetUrl }) => {
       <p>Si no solicitaste este cambio, ignora este correo.</p>
     `
   });
+} catch (error) {
+  console.error('[MAIL_SERVICE] Error sending password reset email:', error);
+}
 };
 
 module.exports = {
