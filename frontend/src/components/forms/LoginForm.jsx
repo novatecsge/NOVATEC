@@ -94,6 +94,10 @@ export default function LoginForm() {
         />
 
         <p className="auth-login-text">
+        <Link to="/forgot-password">¿Olvidaste tu contraseña?</Link>
+        </p>
+
+        <p className="auth-login-text">
           ¿No tienes cuenta?{' '}
           <Link to="/register">
             Registrar cuenta

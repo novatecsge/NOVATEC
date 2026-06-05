@@ -47,8 +47,32 @@ const refreshDto = [
     .withMessage('El refresh token es obligatorio')
 ];
 
+const requestPasswordResetDto = [
+  body('email')
+    .trim()
+    .notEmpty()
+    .withMessage('El correo es obligatorio')
+    .matches(ipnEmailRegex)
+    .withMessage('Correo institucional inválido')
+];
+
+const resetPasswordDto = [
+  body('token')
+    .trim()
+    .notEmpty()
+    .withMessage('El token es obligatorio'),
+
+  body('newPassword')
+    .notEmpty()
+    .withMessage('La nueva contraseña es obligatoria')
+    .isLength({ min: 8, max: 64 })
+    .withMessage('La contraseña debe tener entre 8 y 64 caracteres')
+];
+
 module.exports = {
   registerDto,
   loginDto,
-  refreshDto
+  refreshDto,
+  requestPasswordResetDto,
+  resetPasswordDto
 };
