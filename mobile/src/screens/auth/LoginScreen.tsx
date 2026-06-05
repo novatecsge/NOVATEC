@@ -10,7 +10,7 @@ import { useAuthStore } from '@/store/auth.store';
 import { useAsyncAction } from '@/hooks/useAsyncAction';
 import { colors } from '@/theme/colors';
 
-export const LoginScreen = () => {
+export const LoginScreen = ({ navigation }: any) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { loading, error, run } = useAsyncAction();
@@ -29,6 +29,11 @@ export const LoginScreen = () => {
       <Input label="Contraseña" value={password} onChangeText={setPassword} secureTextEntry />
       {error ? <Text style={{ color: colors.danger, marginBottom: 10 }}>{error}</Text> : null}
       <Button title="Iniciar sesión" onPress={login} loading={loading} />
+      <Button
+      title="¿Olvidaste tu contraseña?"
+      variant="outline"
+      onPress={() => navigation.navigate('ForgotPassword')}
+    />
     </View>
   </Screen>;
 };

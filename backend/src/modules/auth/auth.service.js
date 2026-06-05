@@ -9,6 +9,7 @@ const {
 const { withTransaction } = require('../../shared/utils/transaction');
 const authRepository = require('./auth.repository');
 const ROLES = require('../../shared/constants/roles');
+const { sendPasswordResetEmail } = require('../../shared/services/mail.service');
 
 const hashToken = (token) => crypto.createHash('sha256').update(token).digest('hex');
 
@@ -30,6 +31,98 @@ const sanitizeUser = (user) => ({
   createdAt: user.created_at,
   totalVehicles: Number(user.total_vehicles || 0)
 });
+
+const getPasswordResetExpirationDate = () => {
+  const date = new Date();
+  date.setMinutes(date.getMinutes() + 30);
+  return date;
+};
+
+const requestPasswordReset = async (email) => {
+  return withTransaction(async (client) => {
+    const user = await authRepository.findUserByEmail(email, client);
+
+    if (!user || !user.is_active || user.is_disabled) {
+      return { sent: true };
+    }
+
+    await authRepository.revokeActivePasswordResetTokens(user.id, client);
+
+    const rawToken = crypto.randomBytes(32).toString('hex');
+    const resetTokenHash = hashToken(rawToken);
+
+    await authRepository.createPasswordResetToken({
+      userId: user.id,
+      resetTokenHash,
+      expiresAt: getPasswordResetExpirationDate()
+    }, client);
+
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const resetUrl = `${frontendUrl}/reset-password?token=${rawToken}`;
+
+    await sendPasswordResetEmail({
+      to: user.email,
+      fullName: user.full_name,
+      resetUrl
+    });
+
+    await authRepository.createAuditLog({
+      actorUserId: user.id,
+      action: 'REQUEST_PASSWORD_RESET',
+      moduleName: 'AUTH',
+      entityType: 'USER',
+      entityId: user.id,
+      oldData: {},
+      newData: { email: user.email }
+    }, client);
+
+    return {
+      sent: true,
+      resetUrl: process.env.NODE_ENV === 'production' ? undefined : resetUrl
+    };
+  });
+};
+
+const resetPassword = async ({ token, newPassword }) => {
+  if (!token || !newPassword) {
+    throw new AppError('Token y nueva contraseña son obligatorios', 400, 'RESET_REQUIRED');
+  }
+
+  if (newPassword.length < 8) {
+    throw new AppError('La contraseña debe tener al menos 8 caracteres', 400, 'PASSWORD_TOO_SHORT');
+  }
+
+  return withTransaction(async (client) => {
+    const resetTokenHash = hashToken(token);
+    const resetToken = await authRepository.findPasswordResetToken(resetTokenHash, client);
+
+    if (!resetToken || resetToken.used_at || new Date(resetToken.expires_at) < new Date()) {
+      throw new AppError('El enlace de recuperación es inválido o expiró', 400, 'INVALID_RESET_TOKEN');
+    }
+
+    if (!resetToken.is_active || resetToken.is_disabled) {
+      throw new AppError('La cuenta está inactiva o deshabilitada', 403, 'USER_INACTIVE');
+    }
+
+    const passwordHash = await hashPassword(newPassword);
+
+    await authRepository.updatePassword(resetToken.user_id, passwordHash, client);
+    await authRepository.markPasswordResetTokenUsed(resetToken.id, client);
+    await authRepository.markAllSessionsCompromised(resetToken.user_id, client);
+
+    await authRepository.createAuditLog({
+      actorUserId: resetToken.user_id,
+      action: 'RESET_PASSWORD',
+      moduleName: 'AUTH',
+      entityType: 'USER',
+      entityId: resetToken.user_id,
+      oldData: {},
+      newData: { updated: true }
+    }, client);
+
+    return { updated: true };
+  });
+};
 
 const buildPayload = (user) => ({
   userId: user.id,
@@ -261,5 +354,7 @@ module.exports = {
   login,
   refresh,
   me,
-  changePassword
+  changePassword,
+  requestPasswordReset,
+  resetPassword
 };

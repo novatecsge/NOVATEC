@@ -17,6 +17,16 @@ export const authService = {
     return unwrap(response);
   },
 
+  async requestPasswordReset(payload) {
+  const response = await api.post('/auth/password/forgot', payload);
+  return unwrap(response);
+  },
+
+  async resetPassword(payload) {
+  const response = await api.post('/auth/password/reset', payload);
+  return unwrap(response);
+  },
+
   async changePassword(payload) {
     const response = await api.patch('/auth/password', payload);
     return unwrap(response);

@@ -38,6 +38,66 @@ const findUserByEmail = async (email, client = null) => {
   return result.rows[0] || null;
 };
 
+const revokeActivePasswordResetTokens = async (userId, client = null) => {
+  const db = runner(client);
+
+  await db.query(`
+    UPDATE password_reset_tokens
+    SET used_at = NOW()
+    WHERE user_id = $1
+      AND used_at IS NULL
+  `, [userId]);
+};
+
+const createPasswordResetToken = async ({ userId, resetTokenHash, expiresAt }, client = null) => {
+  const db = runner(client);
+
+  const result = await db.query(`
+    INSERT INTO password_reset_tokens (
+      user_id,
+      reset_token_hash,
+      expires_at
+    )
+    VALUES ($1, $2, $3)
+    RETURNING id, user_id, expires_at, created_at
+  `, [userId, resetTokenHash, expiresAt]);
+
+  return result.rows[0];
+};
+
+const findPasswordResetToken = async (resetTokenHash, client = null) => {
+  const db = runner(client);
+
+  const result = await db.query(`
+    SELECT
+      prt.id,
+      prt.user_id,
+      prt.expires_at,
+      prt.used_at,
+      u.email,
+      u.full_name,
+      u.password_hash,
+      u.is_active,
+      u.is_disabled
+    FROM password_reset_tokens prt
+    INNER JOIN users u ON u.id = prt.user_id
+    WHERE prt.reset_token_hash = $1
+    LIMIT 1
+  `, [resetTokenHash]);
+
+  return result.rows[0] || null;
+};
+
+const markPasswordResetTokenUsed = async (tokenId, client = null) => {
+  const db = runner(client);
+
+  await db.query(`
+    UPDATE password_reset_tokens
+    SET used_at = NOW()
+    WHERE id = $1
+  `, [tokenId]);
+};
+
 const findUserById = async (userId, client = null) => {
   const db = runner(client);
   const sql = `
@@ -222,5 +282,9 @@ module.exports = {
   getActiveSessionsByUser,
   revokeSessionById,
   markAllSessionsCompromised,
-  createAuditLog
+  createAuditLog,
+  revokeActivePasswordResetTokens,
+  createPasswordResetToken,
+  findPasswordResetToken,
+  markPasswordResetTokenUsed
 };

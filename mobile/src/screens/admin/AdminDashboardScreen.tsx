@@ -59,7 +59,7 @@ export const AdminDashboardScreen = () => {
   }, [data]);
 
   return <Screen>
-    <Header title="Dashboard Admin" subtitle="Métricas reales consumidas desde el backend del sistema web." />
+    <Header title="Dashboard Admin" subtitle="Métricas reales del sistema." />
     <Button title="Actualizar" onPress={load} loading={loading} />
     {error ? <Text style={{ color: colors.danger, marginBottom: 10 }}>{error}</Text> : null}
     <View style={{ flexDirection:'row', flexWrap:'wrap', gap: 10 }}>

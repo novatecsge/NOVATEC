@@ -56,10 +56,34 @@ const me = async (req, res, next) => {
   }
 };
 
+const requestPasswordReset = async (req, res, next) => {
+  try {
+    const result = await authService.requestPasswordReset(req.body.email);
+    return successResponse(res, 'Si el correo existe, se enviaron instrucciones de recuperación', result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const resetPassword = async (req, res, next) => {
+  try {
+    const result = await authService.resetPassword({
+      token: req.body.token,
+      newPassword: req.body.newPassword
+    });
+
+    return successResponse(res, 'Contraseña restablecida correctamente', result);
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   register,
   login,
   refresh,
+  requestPasswordReset,
+  resetPassword,
   me,
   changePassword
 };

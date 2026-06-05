@@ -77,7 +77,7 @@ export const ParkingMapScreen = () => {
   const reserved = liveSpaces.filter((s) => normalizeStatus(s.status) === 'RESERVED').length;
 
   return <Screen>
-    <Header title="Mapa" subtitle="Misma distribución SVG del mapa web, con estados del backend en tiempo real." />
+    <Header title="Mapa" subtitle="Mapa en tiempo real del estacionamiento" />
     <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
       <Text style={{ color: colors.success, fontWeight: '800' }}>Disponibles: {available}</Text>
       <Text style={{ color: colors.danger, fontWeight: '800' }}>Ocupados: {occupied}</Text>
@@ -86,15 +86,7 @@ export const ParkingMapScreen = () => {
     </View>
     <ListState loading={loading} empty={!loading && liveSpaces.length === 0} />
     <Card>
-      <Svg viewBox="0 0 1600 1100" width="100%" height={520}>
-        <Polygon
-          points="290,40 760,150 890,280 840,330 970,700 930,720 945,790 520,860 360,650 450,510 430,400 270,320 120,520 120,760 360,760 360,900 70,900 70,580 170,420 90,390 250,90"
-          fill="#ffffff"
-          stroke="#1f2937"
-          strokeWidth="5"
-        />
-        <Path d="M80 580 H355 V900 M250 90 L290 40 L760 150 L890 280 M430 400 L270 320 M945 790 L520 860" stroke="#e5e7eb" strokeWidth="16" strokeLinecap="round" opacity="0.75" />
-        <Path d="M80 580 H355 V900 M250 90 L290 40 L760 150 L890 280 M430 400 L270 320 M945 790 L520 860" stroke="#cbd5e1" strokeWidth="2" strokeDasharray="18 18" strokeLinecap="round" />
+      <Svg viewBox="-50 0 1650 1000" width="100%" height={520}>
         {liveSpaces.map((space) => {
           const x = Number(space.x ?? 0);
           const y = Number(space.y ?? 0);
@@ -109,6 +101,6 @@ export const ParkingMapScreen = () => {
         })}
       </Svg>
     </Card>
-    <Card><Text style={{ color: colors.muted }}>Este mapa usa las coordenadas del componente web y escucha Socket.IO: space:update, access:entry, access:exit y reservation:new.</Text></Card>
+    <Card><Text style={{ color: colors.muted }}>Este mapa fue personalizado y creado desde cero. ©NOVATEC</Text></Card>
   </Screen>;
 };

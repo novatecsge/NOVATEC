@@ -29,7 +29,7 @@ export const VehiclesScreen = () => {
   };
   const remove = async (id: string) => { try { await vehiclesService.remove(id); await load(); } catch(e) { Alert.alert('No se pudo eliminar', getErrorMessage(e)); } };
   return <Screen>
-    <Header title="Mis vehículos" subtitle="Usa las mismas APIs del sistema web." />
+    <Header title="Mis vehículos" subtitle="Gestión de tus vehículos." />
     <Card><Input label="Placa" value={plate} onChangeText={setPlate} autoCapitalize="characters" /><Input label="Marca" value={brand} onChangeText={setBrand} /><Input label="Modelo" value={model} onChangeText={setModel} /><Input label="Color" value={color} onChangeText={setColor} /><Input label="Año" value={year} onChangeText={setYear} keyboardType="numeric" /><Button title="Registrar vehículo" loading={saving} onPress={create} /></Card>
     <ListState loading={loading} error={error} empty={!loading && toArray(vehicles).length === 0} />
     {toArray<Vehicle>(vehicles).map((v) => <Card key={String(v.id || v.plate || v.licensePlate)}><View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 12 }}><View style={{ flex: 1 }}><Text style={{ fontSize: 17, fontWeight: '900', color: colors.text }}>{String(v.plate || v.licensePlate || 'Sin placa')}</Text><Text style={{ color: colors.muted }}>{[v.brand, v.model, v.color].filter(Boolean).join(' · ') || 'Sin detalles'}</Text></View><Button title="Eliminar" variant="danger" onPress={() => v.id ? remove(v.id) : undefined} /></View></Card>)}
