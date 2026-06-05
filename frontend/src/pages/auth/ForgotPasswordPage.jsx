@@ -18,7 +18,7 @@ export default function ForgotPasswordPage() {
 
     try {
       const result = await authService.requestPasswordReset({ email });
-      setMessage('Si el correo existe, se enviaron instrucciones para recuperar la contraseña.');
+      setMessage('Actualmente el servicio no está disponible, contacta con un administrador para recuperar la contraseña.');
       if (result?.resetUrl) setDevUrl(result.resetUrl);
     } catch (err) {
       setError(err?.response?.data?.message || 'No se pudo solicitar la recuperación.');
