@@ -18,7 +18,7 @@ export const ForgotPasswordScreen = ({ navigation }: any) => {
       setLoading(true);
       const result: any = await authService.requestPasswordReset({ email: email.trim() });
       if (result?.resetUrl) setToken(result.resetUrl.split('token=')[1] || '');
-      Alert.alert('Solicitud enviada', 'Si el correo existe, recibirás instrucciones.');
+      Alert.alert('Actualmente el servicio no está disponible, contacta con un administrador para recuperar la contraseña.');
     } catch (error) {
       Alert.alert('Error', getErrorMessage(error));
     } finally {

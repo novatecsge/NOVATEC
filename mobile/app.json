@@ -4,10 +4,10 @@
     "slug": "sge-cecyt9-mobile",
     "version": "0.5.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/logonovatec.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/splashnovatec.png",
       "resizeMode": "contain",
       "backgroundColor": "#0f172a"
     },
@@ -21,7 +21,7 @@
     "android": {
       "package": "mx.novatec.sgececyt9",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/logonovatec.png",
         "backgroundColor": "#0f172a"
       },
       "permissions": [
@@ -29,14 +29,15 @@
       ]
     },
     "extra": {
-      "apiUrl": "http://10.0.2.2:3000/api/v1",
-      "socketUrl": "http://10.0.2.2:3000",
+      "apiUrl": "https://novatec.onrender.com/api/v1",
+      "socketUrl": "https://novatec.onrender.com",
       "eas": {
-        "projectId": "REEMPLAZAR_EN_EAS"
+        "projectId": "4fa9788c-69be-41c0-885c-33c8c63260ef"
       }
     },
     "plugins": [
       "@react-native-community/datetimepicker"
-    ]
+    ],
+    "owner": "novatec"
   }
 }
